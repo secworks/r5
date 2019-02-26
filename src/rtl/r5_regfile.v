@@ -41,15 +41,15 @@ module r5_regfile (
                    input wire           clk,
                    input wire           reset_n,
 
-                   input wire [4 : 0]   src0,
-                   output wire [31 : 0] src0_data,
+                   input wire [4 : 0]   rs1,
+                   output wire [31 : 0] rs1_data,
 
-                   input wire [4 : 0]   src1,
-                   output wire [31 : 0] src1_data,
+                   input wire [4 : 0]   rs2,
+                   output wire [31 : 0] rs2_data,
 
-                   input wire [4 : 0]   dst,
-                   input wire           dst_we,
-                   input wire [31 : 0]  dst_data
+                   input wire [4 : 0]   rd,
+                   input wire           rd_we,
+                   input wire [31 : 0]  rd_data
                   );
 
 
@@ -62,15 +62,15 @@ module r5_regfile (
   //----------------------------------------------------------------
   // Wires.
   //----------------------------------------------------------------
-  reg [31 : 0] tmp_src0_data;
-  reg [31 : 0] tmp_src1_data;
+  reg [31 : 0] tmp_rs1_data;
+  reg [31 : 0] tmp_rs2_data;
 
 
   //----------------------------------------------------------------
   // Concurrent connectivity for ports etc.
   //----------------------------------------------------------------
-  assign src0_data = tmp_src0_data;
-  assign src1_data = tmp_src1_data;
+  assign rs1_data = tmp_rs1_data;
+  assign rs2_data = tmp_rs2_data;
 
 
   //----------------------------------------------------------------
@@ -90,8 +90,8 @@ module r5_regfile (
         end
       else
         begin
-          if (dst_we && (dst > 0))
-            regs[dst] <= dst_data;
+          if (rd_we && (rd > 0))
+            regs[rd] <= rd_data;
         end
     end // reg_update
 
@@ -99,22 +99,22 @@ module r5_regfile (
   //----------------------------------------------------------------
   //----------------------------------------------------------------
   always @*
-    begin : src0_mux
-      if (src0 > 0)
-        tmp_src0_data = regs[src0];
+    begin : rs1_mux
+      if (rs1 > 0)
+        tmp_rs1_data = regs[rs1];
       else
-        tmp_src0_data = 32'h0;
+        tmp_rs1_data = 32'h0;
     end
 
 
   //----------------------------------------------------------------
   //----------------------------------------------------------------
   always @*
-    begin : src1_mux
-      if (src1 > 0)
-        tmp_src1_data = regs[src1];
+    begin :rs2_mux
+      if (rs2 > 0)
+        tmp_rs2_data = regs[rs2];
       else
-        tmp_src1_data = 32'h0;
+        tmp_rs2_data = 32'h0;
     end
 
 endmodule // r5_regfile
