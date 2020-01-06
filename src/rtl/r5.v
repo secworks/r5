@@ -40,12 +40,13 @@ module r5(
           input wire           clk,
           input wire           reset_n,
 
-          input wire           cs,
-          input wire           we,
+          output wire          cs,
+          output wire          we,
 
-          input wire  [31 : 0] address,
-          input wire  [31 : 0] write_data,
-          output wire [31 : 0] read_data
+          output wire [31 : 0] address,
+          output wire [31 : 0] write_data,
+          input wire [31 : 0]  read_data,
+          input wire           ready
          );
 
 
