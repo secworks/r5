@@ -3,7 +3,7 @@ A simple Verilog implementation of RISC-V.
 
 
 ## Status
-Not completed. Does NOT work.
+**Not completed. Does NOT work. Do. Not. Use.**
 
 
 ## Introduction
