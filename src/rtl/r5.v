@@ -85,6 +85,10 @@ module r5(
 
   reg ready_reg;
 
+  reg [31 : 0] address_reg;
+  reg [31 : 0] address_new;
+  reg          address_we;
+
   reg [31 : 0] write_data_reg;
   reg [31 : 0] write_data_new;
   reg          write_data_we;
@@ -105,8 +109,8 @@ module r5(
 
 
   reg [4 : 0] r5_ctrl_reg;
-  reg [4 : 0] r5_ctrl_reg;
-  reg         r5_ctrl_new;
+  reg [4 : 0] r5_ctrl_new;
+  reg         r5_ctrl_we;
 
 
   //----------------------------------------------------------------
@@ -151,8 +155,6 @@ module r5(
   //----------------------------------------------------------------
   always @ (posedge clk or negedge reset_n)
     begin : reg_update
-      integer i;
-
       if (!reset_n)
         begin
           pc_reg         <= 32'h0;
@@ -176,7 +178,7 @@ module r5(
             we_reg <= we_new;
 
           if (instr_we)
-            instruction_reg = read_data;
+            instr_reg <= read_data;
 
           if (address_we)
             address_reg <= address_new;
