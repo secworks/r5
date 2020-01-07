@@ -100,6 +100,9 @@ module r5(
   reg          pc_rst;
   reg          pc_jmp;
 
+  reg [31 : 0] instr_reg;
+  reg          instr_we;
+
 
   reg [4 : 0] r5_ctrl_reg;
   reg [4 : 0] r5_ctrl_reg;
@@ -141,6 +144,7 @@ module r5(
           cs_reg         <= 1'h0;
           we_reg         <= 1'h0;
           ready_reg      <= 1'h0;
+          instr_reg      <= 32'h0;
           address_reg    <= 32'h0;
           read_data_reg  <= 32'h0;
           write_data_reg <= 32'h0;
@@ -155,6 +159,9 @@ module r5(
 
           if (we_we)
             we_reg <= we_new;
+
+          if (instr_we)
+            instruction_reg = read_data;
 
           if (address_we)
             address_reg <= address_new;
@@ -214,8 +221,11 @@ module r5(
       cs_we          = 1'h0;
       we_new         = 1'h0;
       we_we          = 1'h0;
+      address_new    = 32'h0;
+      address_we     = 1'h0;
       write_data_new = 32'h0;
       write_data_we  = 1'h0;
+      instr_we       = 1'h0;
       read_data_we   = 1'h0;
       pc_jmp_addr    = 32'h0;
       pc_rst         = 1'h0;
@@ -240,11 +250,25 @@ module r5(
 
         CTRL_INS_FETCH0:
           begin
-
+            cs_new      = 1'h1;
+            cs_we       = 1'h1;
+            address_new = pc_reg;
+            address_we  = 1'h1;
+            r5_ctrl_new = CTRL_INS_FETCH1;
+            r5_ctrl_we  = 1'h1;
           end
 
         CTRL_INS_FETCH1:
           begin
+            if (ready_reg)
+              begin
+                cs_new      = 1'h0;
+                cs_we       = 1'h1;
+                instr_we    = 1'h1;
+                pc_inc      = 1'h1;
+                r5_ctrl_new = CTRL_INS_DECODE0;
+                r5_ctrl_we  = 1'h1;
+              end
           end
 
         CTRL_INS_DECODE0:
