@@ -53,7 +53,7 @@ module r5(
   //----------------------------------------------------------------
   // Internal constant and parameter definitions.
   //----------------------------------------------------------------
-  parameter RESET_VECTOR = 32'h00001000;
+  parameter BOOT_VECTOR = 32'h00001000;
 
   localparam CTRL_RESET       = 5'h00;
   localparam CTRL_BOOT        = 5'h01;
@@ -94,7 +94,12 @@ module r5(
 
   reg [31 : 0] pc_reg;
   reg [31 : 0] pc_new;
+  reg [31 : 0] pc_jmp_addr;
   reg          pc_we;
+  reg          pc_inc;
+  reg          pc_rst;
+  reg          pc_jmp;
+
 
   reg [4 : 0] r5_ctrl_reg;
   reg [4 : 0] r5_ctrl_reg;
@@ -169,6 +174,36 @@ module r5(
         end
     end // reg_update
 
+
+  //----------------------------------------------------------------
+  // pc_logic
+  // The logic implementing the program counter (PC) updates
+  //----------------------------------------------------------------
+  always @*
+    begin : pc_logic
+      pc_new = 32'h0;
+      pc_we  = 1'h0;
+
+      if (pc_rst)
+        begin
+          pc_new = BOOT_VECTOR;
+          pc_we  = 1'h1;
+        end
+
+      if (pc_inc)
+        begin
+          pc_new = pc_reg + 1'h1;
+          pc_we  = 1'h1;
+        end
+
+      if (pc_jmp)
+        begin
+          pc_new = pc_jmp_addr;
+          pc_we  = 1'h1;
+        end
+    end
+
+
   //----------------------------------------------------------------
   // r5_ctrl
   // Main control FSM.
@@ -182,22 +217,30 @@ module r5(
       write_data_new = 32'h0;
       write_data_we  = 1'h0;
       read_data_we   = 1'h0;
-      pc_new         = 32'h0;
-      pc_we          = 1'h0;
+      pc_jmp_addr    = 32'h0;
+      pc_rst         = 1'h0;
+      pc_inc         = 1'h0;
+      pc_jmp         = 1'h0;
       r5_ctrl_new    = CTRL_RESET;
       r5_ctrl_we     = 1'h0;
 
       case (r5_ctrl_reg)
         CTRL_RESET:
           begin
+            r5_ctrl_new    = CTRL_BOOT;
+            r5_ctrl_we     = 1'h1;
           end
 
         CTRL_BOOT:
           begin
+            pc_rst      = 1'h1;
+            r5_ctrl_new = CTRL_INS_FETCH0;
+            r5_ctrl_we  = 1'h1;
           end
 
         CTRL_INS_FETCH0:
           begin
+
           end
 
         CTRL_INS_FETCH1:
