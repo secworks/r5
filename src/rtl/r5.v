@@ -216,7 +216,7 @@ module r5(
 
       if (pc_inc)
         begin
-          pc_new = pc_reg + 1'h1;
+          pc_new = pc_reg + 3'h4;
           pc_we  = 1'h1;
         end
 
