@@ -55,6 +55,17 @@ module r5(
   //----------------------------------------------------------------
   parameter BOOT_VECTOR = 32'h00001000;
 
+  parameter R_ADD  = 17'b0110011_0000000_000;
+  parameter R_AND  = 17'b0110011_0000000_111;
+  parameter R_OR   = 17'b0110011_0000000_110;
+  parameter R_SUB  = 17'b0110011_0100000_000;
+  parameter R_SLL  = 17'b0110011_0000000_001;
+  parameter R_SLT  = 17'b0110011_0000000_010;
+  parameter R_SLTU = 17'b0110011_0000000_011;
+  parameter R_SRA  = 17'b0110011_0100000_101;
+  parameter R_SRL  = 17'b0110011_0000000_101;
+  parameter R_XOR  = 17'b0110011_0000000_100;
+
   localparam CTRL_RESET       = 5'h00;
   localparam CTRL_BOOT        = 5'h01;
   localparam CTRL_INS_FETCH0  = 5'h04;
@@ -116,6 +127,9 @@ module r5(
   //----------------------------------------------------------------
   // Wires.
   //----------------------------------------------------------------
+  reg [4 : 0]   rs1;
+  reg [4 : 0]   rs2;
+  reg [4 : 0]   rd;
   wire [31 : 0] rs1_data;
   wire [31 : 0] rs2_data;
   reg [31 : 0]  rd_data;
@@ -229,27 +243,28 @@ module r5(
 
 
   //----------------------------------------------------------------
-  // decode_logic
+  // decode_execute_logic
+  //
+  // Logic that decodes the instructions and perform operations.
+  // The logic also detects load and store operations and signal
+  // this to the control.
   //----------------------------------------------------------------
   always @*
     begin : decode_logic
       reg [6 : 0] opcode;
-      reg [4 : 0] rs1;
-      reg [4 : 0] rs2;
-      reg [4 : 0] rd;
       reg [2 : 0] funct3;
       reg [7 : 0] funct7;
       reg [11 : 0] immi;
       reg [11 : 0] imms;
       reg [12 : 0] immsb;
-      reg [19 : 0] immu;
-      reg [19 : 0] immuj;
+      reg [19 : 0] immsu;
+      reg [19 : 0] immsuj;
+
+      // Default assignments.
+      rd_data = 32'h0;
 
       // Extract all possible fields from the instruction.
       opcode = instr_reg[06 : 00];
-      rs1    = instr_reg[19 : 15];
-      rs2    = instr_reg[24 : 20];
-      rd     = instr_reg[11 : 07];
       funct3 = instr_reg[14 : 12];
       funct7 = instr_reg[31 : 25];
       immi   = instr_reg[31 : 20];
@@ -257,6 +272,64 @@ module r5(
       immsb  = {instr_reg[31 : 25], instr_reg[11 : 07]};
       immsu  = {instr_reg[31 : 25], instr_reg[11 : 07]};
       immsuj = {instr_reg[31 : 25], instr_reg[11 : 07]};
+
+      // Execute the different operations.
+      case ({opcode, funct7, funct3})
+        R_ADD:
+          begin
+            rd_data = rs1_data + rs2_data;
+          end
+
+        R_AND:
+          begin
+            rd_data = rs1_data & rs2_data;
+          end
+
+        R_OR:
+          begin
+            rd_data = rs1_data | rs2_data;
+          end
+
+        R_SUB:
+          begin
+            rd_data = rs1_data - rs2_data;
+          end
+
+        R_SLL:
+          begin
+
+          end
+
+        R_SLT:
+          begin
+
+          end
+
+        R_SLTU:
+          begin
+
+          end
+
+        R_SRA:
+          begin
+
+          end
+
+        R_SRL:
+          begin
+
+          end
+
+        R_XOR:
+          begin
+            rd_data = rs1_data | rs2_data;
+          end
+
+        default:
+          begin
+          end
+      endcase // case {opcode,
+
     end
 
 
