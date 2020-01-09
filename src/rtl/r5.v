@@ -254,6 +254,9 @@ module r5(
       funct7 = instr_reg[31 : 25];
       immi   = instr_reg[31 : 20];
       imms   = {instr_reg[31 : 25], instr_reg[11 : 07]};
+      immsb  = {instr_reg[31 : 25], instr_reg[11 : 07]};
+      immsu  = {instr_reg[31 : 25], instr_reg[11 : 07]};
+      immsuj = {instr_reg[31 : 25], instr_reg[11 : 07]};
     end
 
 
