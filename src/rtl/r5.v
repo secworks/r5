@@ -229,6 +229,35 @@ module r5(
 
 
   //----------------------------------------------------------------
+  // decode_logic
+  //----------------------------------------------------------------
+  always @*
+    begin : decode_logic
+      reg [6 : 0] opcode;
+      reg [4 : 0] rs1;
+      reg [4 : 0] rs2;
+      reg [4 : 0] rd;
+      reg [2 : 0] funct3;
+      reg [7 : 0] funct7;
+      reg [11 : 0] immi;
+      reg [11 : 0] imms;
+      reg [12 : 0] immsb;
+      reg [19 : 0] immu;
+      reg [19 : 0] immuj;
+
+      // Extract all possible fields from the instruction.
+      opcode = instr_reg[06 : 00];
+      rs1    = instr_reg[19 : 15];
+      rs2    = instr_reg[24 : 20];
+      rd     = instr_reg[11 : 07];
+      funct3 = instr_reg[14 : 12];
+      funct7 = instr_reg[31 : 25];
+      immi   = instr_reg[31 : 20];
+      imms   = {instr_reg[31 : 25], instr_reg[11 : 07]};
+    end
+
+
+  //----------------------------------------------------------------
   // r5_ctrl
   // Main control FSM.
   //----------------------------------------------------------------
