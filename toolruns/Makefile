@@ -37,6 +37,7 @@
 #===================================================================
 
 TOP_SRC = ../src/rtl/r5.v ../src/rtl/r5_regfile.v
+TOP_TB_SRC = ../src/tb/tb_r5.v
 
 CC = iverilog
 CC_FLAGS = -Wall
@@ -48,8 +49,8 @@ LINT_FLAGS = +1364-2001ext+ --lint-only  -Wall -Wno-fatal -Wno-DECLFILENAME
 all: top.sim
 
 
-top.sim: $(TOP_SRC)
-	$(CC) $(CC_FLAGS) -o top.sim $(TOP_SRC)
+top.sim: $(TOP_TB_SRC) $(TOP_SRC)
+	$(CC) $(CC_FLAGS) -o top.sim $(TOP_TB_SRC) $(TOP_SRC)
 
 
 sim-top: top.sim
