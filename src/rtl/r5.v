@@ -118,7 +118,6 @@ module r5(
   reg [31 : 0] instr_reg;
   reg          instr_we;
 
-
   reg [4 : 0] r5_ctrl_reg;
   reg [4 : 0] r5_ctrl_new;
   reg         r5_ctrl_we;
@@ -128,10 +127,10 @@ module r5(
   // Wires.
   //----------------------------------------------------------------
   reg [4 : 0]   rs1;
-  reg [4 : 0]   rs2;
-  reg [4 : 0]   rd;
   wire [31 : 0] rs1_data;
+  reg [4 : 0]   rs2;
   wire [31 : 0] rs2_data;
+  reg [4 : 0]   rd;
   reg [31 : 0]  rd_data;
   reg           rd_we;
 
@@ -151,11 +150,11 @@ module r5(
   r5_regfile regfile(
                      .clk(clk),
                      .reset_n(reset_n),
-                     .rs1(instr_reg[19 : 15]),
+                     .rs1(rs1),
                      .rs1_data(rs1_data),
-                     .rs2(instr_reg[24 : 20]),
+                     .rs2(rs2),
                      .rs2_data(rs2_data),
-                     .rd(instr_reg[11 : 7]),
+                     .rd(rd),
                      .rd_we(rd_we),
                      .rd_data(rd_data)
                     );
@@ -208,7 +207,6 @@ module r5(
 
           if (r5_ctrl_we)
             r5_ctrl_reg <= r5_ctrl_new;
-
         end
     end // reg_update
 
@@ -251,20 +249,24 @@ module r5(
   //----------------------------------------------------------------
   always @*
     begin : decode_logic
-      reg [6 : 0] opcode;
-      reg [2 : 0] funct3;
-      reg [7 : 0] funct7;
+      reg [6 : 0]  opcode;
+      reg [2 : 0]  funct3;
+      reg [7 : 0]  funct7;
       reg [11 : 0] immi;
       reg [11 : 0] imms;
       reg [12 : 0] immsb;
       reg [19 : 0] immsu;
       reg [19 : 0] immsuj;
+      reg [4 : 0]  shamt;
 
       // Default assignments.
       rd_data = 32'h0;
 
       // Extract all possible fields from the instruction.
       opcode = instr_reg[06 : 00];
+      rs1    = instr_reg[19 : 15];
+      rs2    = instr_reg[24 : 20];
+      rd     = instr_reg[11 : 07];
       funct3 = instr_reg[14 : 12];
       funct7 = instr_reg[31 : 25];
       immi   = instr_reg[31 : 20];
@@ -272,6 +274,7 @@ module r5(
       immsb  = {instr_reg[31 : 25], instr_reg[11 : 07]};
       immsu  = {instr_reg[31 : 25], instr_reg[11 : 07]};
       immsuj = {instr_reg[31 : 25], instr_reg[11 : 07]};
+      shamt  = instr_reg[24 : 20];
 
       // Execute the different operations.
       case ({opcode, funct7, funct3})
@@ -322,7 +325,7 @@ module r5(
 
         R_XOR:
           begin
-            rd_data = rs1_data | rs2_data;
+            rd_data = rs1_data ^ rs2_data;
           end
 
         default:
@@ -439,10 +442,9 @@ module r5(
           begin
           end
 
-    default:
-    begin
-    end
-
+        default:
+          begin
+          end
       endcase // case (r5_ctrl_reg)
     end // r5_ctrl
 
