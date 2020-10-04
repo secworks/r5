@@ -1,7 +1,7 @@
 # r5
 A simple Verilog implementation of RISC-V.
 
-[![License](https://img.shields.io/badge/License-BSD%202--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)
+o[![License](https://img.shields.io/badge/License-BSD%202--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)
 
 ## Status
 **Not completed. Does NOT work. Do. Not. Use.**
